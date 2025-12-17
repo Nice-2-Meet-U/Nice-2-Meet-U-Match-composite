@@ -8,7 +8,6 @@ import logging
 from typing import Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from services.event_publisher import get_event_publisher
 from models.match import MatchGet
 
 logger = logging.getLogger(__name__)
@@ -219,9 +218,9 @@ def generate_matches_for_user_service(
                 match_response = requests.post(
                     f"{matches_service_url}/matches/",
                     json={
-                        "pool_id": pool_id,
+                        "pool_id": str(pool_id),
                         "user1_id": str(user_id),
-                        "user2_id": member.get("user_id"),
+                        "user2_id": str(member.get("user_id")),
                     },
                     timeout=REQUEST_TIMEOUT
                 )
@@ -391,12 +390,6 @@ def delete_user_from_pool_service(user_id: UUID, pools_service_url: str):
         )
         delete_response.raise_for_status()
         result = delete_response.json()
-        
-        # Publish event for async match cleanup (if pool_id is in response)
-        pool_id = result.get("pool_id")
-        if pool_id:
-            publisher = get_event_publisher()
-            publisher.publish_user_left_pool(pool_id=UUID(pool_id), user_id=user_id)
         
         return result
 

@@ -33,7 +33,8 @@ from models.user_match import (
 router = APIRouter()
 
 # Get service URL from environment, default to localhost for local testing
-SERVICE_URL = os.getenv("POOLS_SERVICE_URL", "http://localhost:8000")
+POOLS_SERVICE_URL = os.getenv("POOLS_SERVICE_URL", "http://localhost:8000")
+MATCHES_SERVICE_URL = os.getenv("MATCHES_SERVICE_URL", "http://localhost:8000")
 
 
 @router.get("/{user_id}/pool", response_model=UserPoolRead)
@@ -45,7 +46,7 @@ def get_user_pool(user_id: UUID):
     try:
         pool_data = get_user_pool_from_service(
             user_id=user_id,
-            pools_service_url=SERVICE_URL,
+            pools_service_url=POOLS_SERVICE_URL,
         )
         return pool_data
 
@@ -71,7 +72,7 @@ def add_user_to_pool(user_id: UUID, payload: UserPoolCreate):
             location=payload.location,
             coord_x=payload.coord_x,
             coord_y=payload.coord_y,
-            pools_service_url=SERVICE_URL,
+            pools_service_url=POOLS_SERVICE_URL,
             max_pool_size=20,
         )
         return result
@@ -94,8 +95,8 @@ def generate_matches_for_user(user_id: UUID):
     try:
         result = generate_matches_for_user_service(
             user_id=user_id,
-            matches_service_url=SERVICE_URL,
-            pools_service_url=SERVICE_URL,
+            matches_service_url=MATCHES_SERVICE_URL,
+            pools_service_url=POOLS_SERVICE_URL,
             max_matches=10,
         )
         return result
@@ -119,7 +120,7 @@ def get_user_matches(user_id: UUID):
     try:
         matches = get_user_matches_from_service(
             user_id=user_id,
-            matches_service_url=SERVICE_URL,
+            matches_service_url=MATCHES_SERVICE_URL,
         )
         return {
             "user_id": user_id,
@@ -144,7 +145,7 @@ def get_user_pool_members(user_id: UUID):
     try:
         members = get_pool_members_from_service(
             user_id=user_id,
-            pools_service_url=SERVICE_URL,
+            pools_service_url=POOLS_SERVICE_URL,
         )
         return {
             "user_id": user_id,
@@ -171,7 +172,7 @@ def get_user_decisions(user_id: UUID):
     try:
         decisions = get_user_decisions_from_service(
             user_id=user_id,
-            base_url=SERVICE_URL,
+            base_url=MATCHES_SERVICE_URL,
         )
         return {
             "user_id": user_id,
@@ -196,7 +197,7 @@ def remove_user_from_pool(user_id: UUID):
     try:
         result = delete_user_from_pool_service(
             user_id=user_id,
-            pools_service_url=SERVICE_URL,
+            pools_service_url=POOLS_SERVICE_URL,
         )
         return result
 
@@ -220,8 +221,8 @@ def update_user_pool_coordinates(user_id: UUID, payload: UserPoolUpdate):
         result = update_user_pool_coordinates_service(
             user_id=user_id,
             coord_x=payload.coord_x,
-            coord_y=payload.coord_y,
-            pools_service_url=SERVICE_URL,
+            coord_y=payload.coord_y,         
+            pools_service_url=POOLS_SERVICE_URL,
         )
         return result
 
@@ -252,7 +253,7 @@ def submit_user_match_decision(
             user_id=user_id,
             match_id=match_id,
             decision=payload.decision,
-            matches_service_url=SERVICE_URL,
+            matches_service_url=MATCHES_SERVICE_URL,
         )
         return result
 
